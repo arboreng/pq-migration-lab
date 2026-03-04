@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.25", "1.26"]
+    steps:
+      - uses: actions/checkout@v4
+
+      # go vet/lint/test/build all run inside docker/Dockerfile's `build`
+      # stage, since this module cgo-depends on liboqs and only the dev
+      # image has liboqs's headers/libs and pkg-config wiring available.
+      # GO_VERSION picks the base image so CI proves both the module's
+      # minimum supported Go version (go.mod's floor) and the latest one.
+      - name: Build, vet, test, and build pqlab (in Docker)
+        run: |
+          docker build -f docker/Dockerfile \
+            --build-arg GO_VERSION=${{ matrix.go-version }} \
+            -t pq-migration-lab:ci .
+
+      - name: Smoke-test each registered KEM algorithm
+        run: |
+          docker run --rm pq-migration-lab:ci /out/pqlab demo X25519
+          docker run --rm pq-migration-lab:ci /out/pqlab demo ML-KEM-768
+          docker run --rm pq-migration-lab:ci /out/pqlab demo "Hybrid(X25519+ML-KEM-768)"
+
+      - name: Smoke-test the hybrid TLS 1.3 handshake
+        run: docker run --rm pq-migration-lab:ci /out/pqlab demo hybrid-tls
+
+      - name: Smoke-test each registered signature algorithm
+        run: |
+          docker run --rm pq-migration-lab:ci /out/pqlab demo sign Ed25519
+          docker run --rm pq-migration-lab:ci /out/pqlab demo sign ML-DSA-65
+
+      - name: Smoke-test the certificate migration demo
+        run: docker run --rm pq-migration-lab:ci /out/pqlab demo cert-migration
+
+      - name: Smoke-test the CA rotation demo
+        run: docker run --rm pq-migration-lab:ci /out/pqlab demo ca-rotation
+
+      - name: Smoke-test the TLS interoperability demo
+        run: docker run --rm pq-migration-lab:ci /out/pqlab demo interop-tls
+
+      - name: Smoke-test the benchmark dashboard generator
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/app" -w /app pq-migration-lab:ci \
+            go run ./cmd/benchdash -out /tmp/dashboard-smoke-test.html

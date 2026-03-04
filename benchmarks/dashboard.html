@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pq-migration-lab benchmark dashboard</title>
+<style>
+  .viz-root {
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --baseline: #c3c2b7;
+    /* dataviz reference palette, categorical slots 1-3: blue = classical,
+       aqua = post-quantum, yellow = hybrid (see algorithmInfo.slot above) */
+    --series-1: #2a78d6;
+    --series-2: #1baf7a;
+    --series-3: #eda100;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --gridline: #2c2c2a;
+      --baseline: #383835;
+      --series-1: #3987e5;
+      --series-2: #199e70;
+      --series-3: #c98500;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+    overflow-wrap: break-word;
+  }
+  .viz-root { padding: 24px clamp(16px, 4vw, 48px) 64px; max-width: 1200px; margin: 0 auto; }
+  header p.meta { color: var(--text-secondary); max-width: 72ch; }
+  code { background: var(--surface-1); border-radius: 3px; padding: 0 4px; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  h2 { font-size: 1.15rem; border-bottom: 1px solid var(--gridline); padding-bottom: 8px; }
+  section { margin-top: 40px; }
+  .legend { list-style: none; display: flex; flex-wrap: wrap; gap: 16px; padding: 0; margin: 0 0 16px; color: var(--text-secondary); font-size: 0.9rem; }
+  .legend li { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+  .chart-row { display: flex; flex-wrap: wrap; gap: 24px; }
+  figure.chart { background: var(--surface-1); border-radius: 8px; padding: 12px 16px 4px; margin: 0; flex: 1 1 320px; max-width: 480px; min-width: 0; }
+  figcaption { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
+  figcaption .muted { color: var(--text-muted); }
+  svg { width: 100%; height: auto; display: block; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .tick, .axis-label { fill: var(--text-muted); font-size: 10px; }
+  .bar-label { fill: var(--text-secondary); font-size: 10px; }
+  .bar { cursor: pointer; }
+  g[data-tip]:hover .bar, g[data-tip]:focus .bar { opacity: 0.85; outline: none; }
+  g[data-tip]:focus { outline: 2px solid var(--text-muted); outline-offset: 2px; }
+  details.data-table { margin-top: 16px; color: var(--text-secondary); }
+  details.data-table summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
+  table { border-collapse: collapse; margin-top: 8px; width: 100%; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 4px 12px 4px 0; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
+  th { color: var(--text-muted); font-weight: 600; }
+  #benchdash-tooltip {
+    position: fixed; pointer-events: none; z-index: 10;
+    background: var(--text-primary); color: var(--surface-1);
+    font-size: 0.8rem; padding: 4px 8px; border-radius: 4px;
+    transform: translate(-50%, -100%); margin-top: -8px;
+    opacity: 0; transition: opacity 0.1s ease;
+    max-width: 260px;
+  }
+  #benchdash-tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="benchdash-tooltip" role="tooltip"></div>
+<div class="viz-root">
+<header><h1>pq-migration-lab benchmark dashboard</h1><p class="meta">Generated 2026-07-10 16:24 UTC on linux/arm64, go1.25.12. Not absolute performance claims. Results vary by hardware. Reproduce with <code>go run ./cmd/benchdash</code> (or inside Docker: <code>docker run --rm pq-migration-lab go run ./cmd/benchdash</code>).</p></header>
+<section>
+<h2>KEM benchmarks</h2>
+<ul class="legend">
+<li><span class="swatch" style="background:var(--series-1)"></span>X25519</li>
+<li><span class="swatch" style="background:var(--series-2)"></span>ML-KEM-768</li>
+<li><span class="swatch" style="background:var(--series-3)"></span>Hybrid(X25519+ML-KEM-768)</li>
+</ul>
+<div class="chart-row">
+<figure class="chart">
+<figcaption><strong>KEM</strong>: Time per operation (ns/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="KEM Time per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="206" x2="620" y2="206"/>
+<text class="tick" x="62" y="210" text-anchor="end">25,000</text>
+<line class="gridline" x1="70" y1="148" x2="620" y2="148"/>
+<text class="tick" x="62" y="152" text-anchor="end">50,000</text>
+<line class="gridline" x1="70" y1="90" x2="620" y2="90"/>
+<text class="tick" x="62" y="94" text-anchor="end">75,000</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">100,000</text>
+<g tabindex="0" data-tip="X25519, Generate Keypair: 37,347 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 123.66666666666669 181.35496 Q 123.66666666666669 177.35496 127.66666666666669 177.35496 L 143.66666666666669 177.35496 Q 147.66666666666669 177.35496 147.66666666666669 181.35496 L 147.66666666666669 264 L 123.66666666666669 264 Z"/>
+<text class="bar-label" x="135.66666666666669" y="171.35496" text-anchor="middle">37,347</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Generate Keypair: 17,499 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 149.66666666666669 227.40232 Q 149.66666666666669 223.40232 153.66666666666669 223.40232 L 169.66666666666669 223.40232 Q 173.66666666666669 223.40232 173.66666666666669 227.40232 L 173.66666666666669 264 L 149.66666666666669 264 Z"/>
+<text class="bar-label" x="161.66666666666669" y="217.40232" text-anchor="middle">17,499</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Generate Keypair: 55,404 ns/op">
+<path class="bar" fill="var(--series-3)" d="M 175.66666666666669 139.46272000000002 Q 175.66666666666669 135.46272000000002 179.66666666666669 135.46272000000002 L 195.66666666666669 135.46272000000002 Q 199.66666666666669 135.46272000000002 199.66666666666669 139.46272000000002 L 199.66666666666669 264 L 175.66666666666669 264 Z"/>
+<text class="bar-label" x="187.66666666666669" y="129.46272000000002" text-anchor="middle">55,404</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="X25519, Encapsulate: 74,706 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 307 94.68208000000001 Q 307 90.68208000000001 311 90.68208000000001 L 327 90.68208000000001 Q 331 90.68208000000001 331 94.68208000000001 L 331 264 L 307 264 Z"/>
+<text class="bar-label" x="319" y="84.68208000000001" text-anchor="middle">74,706</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Encapsulate: 17,856 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 333 226.57408 Q 333 222.57408 337 222.57408 L 353 222.57408 Q 357 222.57408 357 226.57408 L 357 264 L 333 264 Z"/>
+<text class="bar-label" x="345" y="216.57408" text-anchor="middle">17,856</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Encapsulate: 95,074 ns/op">
+<path class="bar" fill="var(--series-3)" d="M 359 47.428319999999985 Q 359 43.428319999999985 363 43.428319999999985 L 379 43.428319999999985 Q 383 43.428319999999985 383 47.428319999999985 L 383 264 L 359 264 Z"/>
+<text class="bar-label" x="371" y="37.428319999999985" text-anchor="middle">95,074</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Encapsulate</text>
+<g tabindex="0" data-tip="X25519, Decapsulate: 37,107 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 490.33333333333337 181.91176000000002 Q 490.33333333333337 177.91176000000002 494.33333333333337 177.91176000000002 L 510.33333333333337 177.91176000000002 Q 514.3333333333334 177.91176000000002 514.3333333333334 181.91176000000002 L 514.3333333333334 264 L 490.33333333333337 264 Z"/>
+<text class="bar-label" x="502.33333333333337" y="171.91176000000002" text-anchor="middle">37,107</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Decapsulate: 20,533 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 516.3333333333334 220.36344 Q 516.3333333333334 216.36344 520.3333333333334 216.36344 L 536.3333333333334 216.36344 Q 540.3333333333334 216.36344 540.3333333333334 220.36344 L 540.3333333333334 264 L 516.3333333333334 264 Z"/>
+<text class="bar-label" x="528.3333333333334" y="210.36344" text-anchor="middle">20,533</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Decapsulate: 59,953 ns/op">
+<path class="bar" fill="var(--series-3)" d="M 542.3333333333334 128.90904 Q 542.3333333333334 124.90904 546.3333333333334 124.90904 L 562.3333333333334 124.90904 Q 566.3333333333334 124.90904 566.3333333333334 128.90904 L 566.3333333333334 264 L 542.3333333333334 264 Z"/>
+<text class="bar-label" x="554.3333333333334" y="118.90904" text-anchor="middle">59,953</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Decapsulate</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+<figure class="chart">
+<figcaption><strong>KEM</strong>: Memory per operation (B/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="KEM Memory per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="186.66666666666666" x2="620" y2="186.66666666666666"/>
+<text class="tick" x="62" y="190.66666666666666" text-anchor="end">2,500</text>
+<line class="gridline" x1="70" y1="109.33333333333334" x2="620" y2="109.33333333333334"/>
+<text class="tick" x="62" y="113.33333333333334" text-anchor="end">5,000</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">7,500</text>
+<g tabindex="0" data-tip="X25519, Generate Keypair: 376 B/op">
+<path class="bar" fill="var(--series-1)" d="M 123.66666666666669 256.36906666666664 Q 123.66666666666669 252.36906666666667 127.66666666666669 252.36906666666667 L 143.66666666666669 252.36906666666667 Q 147.66666666666669 252.36906666666667 147.66666666666669 256.36906666666664 L 147.66666666666669 264 L 123.66666666666669 264 Z"/>
+<text class="bar-label" x="135.66666666666669" y="246.36906666666667" text-anchor="middle">376</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Generate Keypair: 4,112 B/op">
+<path class="bar" fill="var(--series-2)" d="M 149.66666666666669 140.80213333333333 Q 149.66666666666669 136.80213333333333 153.66666666666669 136.80213333333333 L 169.66666666666669 136.80213333333333 Q 173.66666666666669 136.80213333333333 173.66666666666669 140.80213333333333 L 173.66666666666669 264 L 149.66666666666669 264 Z"/>
+<text class="bar-label" x="161.66666666666669" y="130.80213333333333" text-anchor="middle">4,112</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Generate Keypair: 5,856 B/op">
+<path class="bar" fill="var(--series-3)" d="M 175.66666666666669 86.8544 Q 175.66666666666669 82.8544 179.66666666666669 82.8544 L 195.66666666666669 82.8544 Q 199.66666666666669 82.8544 199.66666666666669 86.8544 L 199.66666666666669 264 L 175.66666666666669 264 Z"/>
+<text class="bar-label" x="187.66666666666669" y="76.8544" text-anchor="middle">5,856</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="X25519, Encapsulate: 496 B/op">
+<path class="bar" fill="var(--series-1)" d="M 307 252.65706666666665 Q 307 248.65706666666665 311 248.65706666666665 L 327 248.65706666666665 Q 331 248.65706666666665 331 252.65706666666665 L 331 264 L 307 264 Z"/>
+<text class="bar-label" x="319" y="242.65706666666665" text-anchor="middle">496</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Encapsulate: 1,184 B/op">
+<path class="bar" fill="var(--series-2)" d="M 333 231.37493333333333 Q 333 227.37493333333333 337 227.37493333333333 L 353 227.37493333333333 Q 357 227.37493333333333 357 231.37493333333333 L 357 264 L 333 264 Z"/>
+<text class="bar-label" x="345" y="221.37493333333333" text-anchor="middle">1,184</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Encapsulate: 5,152 B/op">
+<path class="bar" fill="var(--series-3)" d="M 359 108.63146666666668 Q 359 104.63146666666668 363 104.63146666666668 L 379 104.63146666666668 Q 383 104.63146666666668 383 108.63146666666668 L 383 264 L 359 264 Z"/>
+<text class="bar-label" x="371" y="98.63146666666668" text-anchor="middle">5,152</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Encapsulate</text>
+<g tabindex="0" data-tip="X25519, Decapsulate: 128 B/op">
+<path class="bar" fill="var(--series-1)" d="M 490.33333333333337 264 Q 490.33333333333337 260.0405333333333 494.29280000000006 260.0405333333333 L 510.3738666666667 260.0405333333333 Q 514.3333333333334 260.0405333333333 514.3333333333334 264 L 514.3333333333334 264 L 490.33333333333337 264 Z"/>
+<text class="bar-label" x="502.33333333333337" y="254.04053333333331" text-anchor="middle">128</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Decapsulate: 32 B/op">
+<path class="bar" fill="var(--series-2)" d="M 516.3333333333334 264 Q 516.3333333333334 263.01013333333333 517.3232 263.01013333333333 L 539.3434666666667 263.01013333333333 Q 540.3333333333334 263.01013333333333 540.3333333333334 264 L 540.3333333333334 264 L 516.3333333333334 264 Z"/>
+<text class="bar-label" x="528.3333333333334" y="257.01013333333333" text-anchor="middle">32</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Decapsulate: 2,417 B/op">
+<path class="bar" fill="var(--series-3)" d="M 542.3333333333334 193.23413333333332 Q 542.3333333333334 189.23413333333332 546.3333333333334 189.23413333333332 L 562.3333333333334 189.23413333333332 Q 566.3333333333334 189.23413333333332 566.3333333333334 193.23413333333332 L 566.3333333333334 264 L 542.3333333333334 264 Z"/>
+<text class="bar-label" x="554.3333333333334" y="183.23413333333332" text-anchor="middle">2,417</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Decapsulate</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+<figure class="chart">
+<figcaption><strong>KEM</strong>: Allocations per operation (allocs/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="KEM Allocations per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="186.66666666666666" x2="620" y2="186.66666666666666"/>
+<text class="tick" x="62" y="190.66666666666666" text-anchor="end">13</text>
+<line class="gridline" x1="70" y1="109.33333333333334" x2="620" y2="109.33333333333334"/>
+<text class="tick" x="62" y="113.33333333333334" text-anchor="end">25</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">38</text>
+<g tabindex="0" data-tip="X25519, Generate Keypair: 7 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 123.66666666666669 224.69333333333333 Q 123.66666666666669 220.69333333333333 127.66666666666669 220.69333333333333 L 143.66666666666669 220.69333333333333 Q 147.66666666666669 220.69333333333333 147.66666666666669 224.69333333333333 L 147.66666666666669 264 L 123.66666666666669 264 Z"/>
+<text class="bar-label" x="135.66666666666669" y="214.69333333333333" text-anchor="middle">7</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Generate Keypair: 6 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 149.66666666666669 230.88 Q 149.66666666666669 226.88 153.66666666666669 226.88 L 169.66666666666669 226.88 Q 173.66666666666669 226.88 173.66666666666669 230.88 L 173.66666666666669 264 L 149.66666666666669 264 Z"/>
+<text class="bar-label" x="161.66666666666669" y="220.88" text-anchor="middle">6</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Generate Keypair: 17 allocs/op">
+<path class="bar" fill="var(--series-3)" d="M 175.66666666666669 162.82666666666665 Q 175.66666666666669 158.82666666666665 179.66666666666669 158.82666666666665 L 195.66666666666669 158.82666666666665 Q 199.66666666666669 158.82666666666665 199.66666666666669 162.82666666666665 L 199.66666666666669 264 L 175.66666666666669 264 Z"/>
+<text class="bar-label" x="187.66666666666669" y="152.82666666666665" text-anchor="middle">17</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="X25519, Encapsulate: 9 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 307 212.32 Q 307 208.32 311 208.32 L 327 208.32 Q 331 208.32 331 212.32 L 331 264 L 307 264 Z"/>
+<text class="bar-label" x="319" y="202.32" text-anchor="middle">9</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Encapsulate: 2 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 333 255.62666666666667 Q 333 251.62666666666667 337 251.62666666666667 L 353 251.62666666666667 Q 357 251.62666666666667 357 255.62666666666667 L 357 264 L 333 264 Z"/>
+<text class="bar-label" x="345" y="245.62666666666667" text-anchor="middle">2</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Encapsulate: 34 allocs/op">
+<path class="bar" fill="var(--series-3)" d="M 359 57.653333333333336 Q 359 53.653333333333336 363 53.653333333333336 L 379 53.653333333333336 Q 383 53.653333333333336 383 57.653333333333336 L 383 264 L 359 264 Z"/>
+<text class="bar-label" x="371" y="47.653333333333336" text-anchor="middle">34</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Encapsulate</text>
+<g tabindex="0" data-tip="X25519, Decapsulate: 3 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 490.33333333333337 249.44 Q 490.33333333333337 245.44 494.33333333333337 245.44 L 510.33333333333337 245.44 Q 514.3333333333334 245.44 514.3333333333334 249.44 L 514.3333333333334 264 L 490.33333333333337 264 Z"/>
+<text class="bar-label" x="502.33333333333337" y="239.44" text-anchor="middle">3</text>
+</g>
+<g tabindex="0" data-tip="ML-KEM-768, Decapsulate: 1 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 516.3333333333334 261.81333333333333 Q 516.3333333333334 257.81333333333333 520.3333333333334 257.81333333333333 L 536.3333333333334 257.81333333333333 Q 540.3333333333334 257.81333333333333 540.3333333333334 261.81333333333333 L 540.3333333333334 264 L 516.3333333333334 264 Z"/>
+<text class="bar-label" x="528.3333333333334" y="251.81333333333333" text-anchor="middle">1</text>
+</g>
+<g tabindex="0" data-tip="Hybrid(X25519+ML-KEM-768), Decapsulate: 24 allocs/op">
+<path class="bar" fill="var(--series-3)" d="M 542.3333333333334 119.52000000000001 Q 542.3333333333334 115.52000000000001 546.3333333333334 115.52000000000001 L 562.3333333333334 115.52000000000001 Q 566.3333333333334 115.52000000000001 566.3333333333334 119.52000000000001 L 566.3333333333334 264 L 542.3333333333334 264 Z"/>
+<text class="bar-label" x="554.3333333333334" y="109.52000000000001" text-anchor="middle">24</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Decapsulate</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+</div>
+<details class="data-table"><summary>Table view</summary>
+<table>
+<thead><tr><th>Algorithm</th><th>Operation</th><th>ns/op</th><th>B/op</th><th>allocs/op</th></tr></thead>
+<tbody>
+<tr><td>X25519</td><td>Generate Keypair</td><td>37,347</td><td>376</td><td>7</td></tr>
+<tr><td>ML-KEM-768</td><td>Generate Keypair</td><td>17,499</td><td>4,112</td><td>6</td></tr>
+<tr><td>Hybrid(X25519+ML-KEM-768)</td><td>Generate Keypair</td><td>55,404</td><td>5,856</td><td>17</td></tr>
+<tr><td>X25519</td><td>Encapsulate</td><td>74,706</td><td>496</td><td>9</td></tr>
+<tr><td>ML-KEM-768</td><td>Encapsulate</td><td>17,856</td><td>1,184</td><td>2</td></tr>
+<tr><td>Hybrid(X25519+ML-KEM-768)</td><td>Encapsulate</td><td>95,074</td><td>5,152</td><td>34</td></tr>
+<tr><td>X25519</td><td>Decapsulate</td><td>37,107</td><td>128</td><td>3</td></tr>
+<tr><td>ML-KEM-768</td><td>Decapsulate</td><td>20,533</td><td>32</td><td>1</td></tr>
+<tr><td>Hybrid(X25519+ML-KEM-768)</td><td>Decapsulate</td><td>59,953</td><td>2,417</td><td>24</td></tr>
+</tbody>
+</table>
+</details>
+</section>
+<section>
+<h2>Signature benchmarks</h2>
+<ul class="legend">
+<li><span class="swatch" style="background:var(--series-1)"></span>Ed25519</li>
+<li><span class="swatch" style="background:var(--series-2)"></span>ML-DSA-65</li>
+</ul>
+<div class="chart-row">
+<figure class="chart">
+<figcaption><strong>Signature</strong>: Time per operation (ns/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="Signature Time per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="206" x2="620" y2="206"/>
+<text class="tick" x="62" y="210" text-anchor="end">125,000</text>
+<line class="gridline" x1="70" y1="148" x2="620" y2="148"/>
+<text class="tick" x="62" y="152" text-anchor="end">250,000</text>
+<line class="gridline" x1="70" y1="90" x2="620" y2="90"/>
+<text class="tick" x="62" y="94" text-anchor="end">375,000</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">500,000</text>
+<g tabindex="0" data-tip="Ed25519, Generate Keypair: 15,888 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 136.66666666666669 260.627968 Q 136.66666666666669 256.627968 140.66666666666669 256.627968 L 156.66666666666669 256.627968 Q 160.66666666666669 256.627968 160.66666666666669 260.627968 L 160.66666666666669 264 L 136.66666666666669 264 Z"/>
+<text class="bar-label" x="148.66666666666669" y="250.627968" text-anchor="middle">15,888</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Generate Keypair: 107,246 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 162.66666666666669 218.237856 Q 162.66666666666669 214.237856 166.66666666666669 214.237856 L 182.66666666666669 214.237856 Q 186.66666666666669 214.237856 186.66666666666669 218.237856 L 186.66666666666669 264 L 162.66666666666669 264 Z"/>
+<text class="bar-label" x="174.66666666666669" y="208.237856" text-anchor="middle">107,246</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="Ed25519, Sign: 19,914 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 320 258.759904 Q 320 254.759904 324 254.759904 L 340 254.759904 Q 344 254.759904 344 258.759904 L 344 264 L 320 264 Z"/>
+<text class="bar-label" x="332" y="248.759904" text-anchor="middle">19,914</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Sign: 429,293 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 346 68.80804800000001 Q 346 64.80804800000001 350 64.80804800000001 L 366 64.80804800000001 Q 370 64.80804800000001 370 68.80804800000001 L 370 264 L 346 264 Z"/>
+<text class="bar-label" x="358" y="58.808048000000014" text-anchor="middle">429,293</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Sign</text>
+<g tabindex="0" data-tip="Ed25519, Verify: 43,506 ns/op">
+<path class="bar" fill="var(--series-1)" d="M 503.33333333333337 247.813216 Q 503.33333333333337 243.813216 507.33333333333337 243.813216 L 523.3333333333334 243.813216 Q 527.3333333333334 243.813216 527.3333333333334 247.813216 L 527.3333333333334 264 L 503.33333333333337 264 Z"/>
+<text class="bar-label" x="515.3333333333334" y="237.813216" text-anchor="middle">43,506</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Verify: 96,396 ns/op">
+<path class="bar" fill="var(--series-2)" d="M 529.3333333333334 223.272256 Q 529.3333333333334 219.272256 533.3333333333334 219.272256 L 549.3333333333334 219.272256 Q 553.3333333333334 219.272256 553.3333333333334 223.272256 L 553.3333333333334 264 L 529.3333333333334 264 Z"/>
+<text class="bar-label" x="541.3333333333334" y="213.272256" text-anchor="middle">96,396</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Verify</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+<figure class="chart">
+<figcaption><strong>Signature</strong>: Memory per operation (B/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="Signature Memory per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="186.66666666666666" x2="620" y2="186.66666666666666"/>
+<text class="tick" x="62" y="190.66666666666666" text-anchor="end">2,500</text>
+<line class="gridline" x1="70" y1="109.33333333333334" x2="620" y2="109.33333333333334"/>
+<text class="tick" x="62" y="113.33333333333334" text-anchor="end">5,000</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">7,500</text>
+<g tabindex="0" data-tip="Ed25519, Generate Keypair: 152 B/op">
+<path class="bar" fill="var(--series-1)" d="M 136.66666666666669 263.29813333333334 Q 136.66666666666669 259.29813333333334 140.66666666666669 259.29813333333334 L 156.66666666666669 259.29813333333334 Q 160.66666666666669 259.29813333333334 160.66666666666669 263.29813333333334 L 160.66666666666669 264 L 136.66666666666669 264 Z"/>
+<text class="bar-label" x="148.66666666666669" y="253.29813333333334" text-anchor="middle">152</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Generate Keypair: 6,281 B/op">
+<path class="bar" fill="var(--series-2)" d="M 162.66666666666669 73.70773333333332 Q 162.66666666666669 69.70773333333332 166.66666666666669 69.70773333333332 L 182.66666666666669 69.70773333333332 Q 186.66666666666669 69.70773333333332 186.66666666666669 73.70773333333332 L 186.66666666666669 264 L 162.66666666666669 264 Z"/>
+<text class="bar-label" x="174.66666666666669" y="63.70773333333332" text-anchor="middle">6,281</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="Ed25519, Sign: 64 B/op">
+<path class="bar" fill="var(--series-1)" d="M 320 264 Q 320 262.02026666666666 321.97973333333334 262.02026666666666 L 342.02026666666666 262.02026666666666 Q 344 262.02026666666666 344 264 L 344 264 L 320 264 Z"/>
+<text class="bar-label" x="332" y="256.02026666666666" text-anchor="middle">64</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Sign: 3,464 B/op">
+<path class="bar" fill="var(--series-2)" d="M 346 160.84693333333334 Q 346 156.84693333333334 350 156.84693333333334 L 366 156.84693333333334 Q 370 156.84693333333334 370 160.84693333333334 L 370 264 L 346 264 Z"/>
+<text class="bar-label" x="358" y="150.84693333333334" text-anchor="middle">3,464</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Sign</text>
+<g tabindex="0" data-tip="Ed25519, Verify: 0 B/op">
+<path class="bar" fill="var(--series-1)" d="M 503.33333333333337 264 Q 503.33333333333337 264 503.33333333333337 264 L 527.3333333333334 264 Q 527.3333333333334 264 527.3333333333334 264 L 527.3333333333334 264 L 503.33333333333337 264 Z"/>
+<text class="bar-label" x="515.3333333333334" y="258" text-anchor="middle">0</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Verify: 0 B/op">
+<path class="bar" fill="var(--series-2)" d="M 529.3333333333334 264 Q 529.3333333333334 264 529.3333333333334 264 L 553.3333333333334 264 Q 553.3333333333334 264 553.3333333333334 264 L 553.3333333333334 264 L 529.3333333333334 264 Z"/>
+<text class="bar-label" x="541.3333333333334" y="258" text-anchor="middle">0</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Verify</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+<figure class="chart">
+<figcaption><strong>Signature</strong>: Allocations per operation (allocs/op)<span class="muted">, lower is better</span></figcaption>
+<svg viewBox="0 0 640 320" role="img" aria-label="Signature Allocations per operation by operation">
+<line class="gridline" x1="70" y1="264" x2="620" y2="264"/>
+<text class="tick" x="62" y="268" text-anchor="end">0</text>
+<line class="gridline" x1="70" y1="186.66666666666666" x2="620" y2="186.66666666666666"/>
+<text class="tick" x="62" y="190.66666666666666" text-anchor="end">3</text>
+<line class="gridline" x1="70" y1="109.33333333333334" x2="620" y2="109.33333333333334"/>
+<text class="tick" x="62" y="113.33333333333334" text-anchor="end">5</text>
+<line class="gridline" x1="70" y1="32" x2="620" y2="32"/>
+<text class="tick" x="62" y="36" text-anchor="end">8</text>
+<g tabindex="0" data-tip="Ed25519, Generate Keypair: 4 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 136.66666666666669 144.26666666666665 Q 136.66666666666669 140.26666666666665 140.66666666666669 140.26666666666665 L 156.66666666666669 140.26666666666665 Q 160.66666666666669 140.26666666666665 160.66666666666669 144.26666666666665 L 160.66666666666669 264 L 136.66666666666669 264 Z"/>
+<text class="bar-label" x="148.66666666666669" y="134.26666666666665" text-anchor="middle">4</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Generate Keypair: 6 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 162.66666666666669 82.39999999999998 Q 162.66666666666669 78.39999999999998 166.66666666666669 78.39999999999998 L 182.66666666666669 78.39999999999998 Q 186.66666666666669 78.39999999999998 186.66666666666669 82.39999999999998 L 186.66666666666669 264 L 162.66666666666669 264 Z"/>
+<text class="bar-label" x="174.66666666666669" y="72.39999999999998" text-anchor="middle">6</text>
+</g>
+<text class="axis-label" x="161.66666666666669" y="284" text-anchor="middle">Generate Keypair</text>
+<g tabindex="0" data-tip="Ed25519, Sign: 1 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 320 237.06666666666666 Q 320 233.06666666666666 324 233.06666666666666 L 340 233.06666666666666 Q 344 233.06666666666666 344 237.06666666666666 L 344 264 L 320 264 Z"/>
+<text class="bar-label" x="332" y="227.06666666666666" text-anchor="middle">1</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Sign: 2 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 346 206.13333333333333 Q 346 202.13333333333333 350 202.13333333333333 L 366 202.13333333333333 Q 370 202.13333333333333 370 206.13333333333333 L 370 264 L 346 264 Z"/>
+<text class="bar-label" x="358" y="196.13333333333333" text-anchor="middle">2</text>
+</g>
+<text class="axis-label" x="345" y="284" text-anchor="middle">Sign</text>
+<g tabindex="0" data-tip="Ed25519, Verify: 0 allocs/op">
+<path class="bar" fill="var(--series-1)" d="M 503.33333333333337 264 Q 503.33333333333337 264 503.33333333333337 264 L 527.3333333333334 264 Q 527.3333333333334 264 527.3333333333334 264 L 527.3333333333334 264 L 503.33333333333337 264 Z"/>
+<text class="bar-label" x="515.3333333333334" y="258" text-anchor="middle">0</text>
+</g>
+<g tabindex="0" data-tip="ML-DSA-65, Verify: 0 allocs/op">
+<path class="bar" fill="var(--series-2)" d="M 529.3333333333334 264 Q 529.3333333333334 264 529.3333333333334 264 L 553.3333333333334 264 Q 553.3333333333334 264 553.3333333333334 264 L 553.3333333333334 264 L 529.3333333333334 264 Z"/>
+<text class="bar-label" x="541.3333333333334" y="258" text-anchor="middle">0</text>
+</g>
+<text class="axis-label" x="528.3333333333334" y="284" text-anchor="middle">Verify</text>
+<line class="baseline" x1="70" y1="264" x2="620" y2="264"/>
+</svg>
+</figure>
+</div>
+<details class="data-table"><summary>Table view</summary>
+<table>
+<thead><tr><th>Algorithm</th><th>Operation</th><th>ns/op</th><th>B/op</th><th>allocs/op</th></tr></thead>
+<tbody>
+<tr><td>Ed25519</td><td>Generate Keypair</td><td>15,888</td><td>152</td><td>4</td></tr>
+<tr><td>ML-DSA-65</td><td>Generate Keypair</td><td>107,246</td><td>6,281</td><td>6</td></tr>
+<tr><td>Ed25519</td><td>Sign</td><td>19,914</td><td>64</td><td>1</td></tr>
+<tr><td>ML-DSA-65</td><td>Sign</td><td>429,293</td><td>3,464</td><td>2</td></tr>
+<tr><td>Ed25519</td><td>Verify</td><td>43,506</td><td>0</td><td>0</td></tr>
+<tr><td>ML-DSA-65</td><td>Verify</td><td>96,396</td><td>0</td><td>0</td></tr>
+</tbody>
+</table>
+</details>
+</section>
+</div>
+<script>
+(function () {
+  var tip = document.getElementById('benchdash-tooltip');
+  function show(el) {
+    var text = el.getAttribute('data-tip');
+    if (!text) return;
+    tip.textContent = text;
+    var rect = el.getBoundingClientRect();
+    tip.style.left = (rect.left + rect.width / 2) + 'px';
+    tip.style.top = rect.top + 'px';
+    tip.classList.add('visible');
+  }
+  function hide() {
+    tip.classList.remove('visible');
+  }
+  document.addEventListener('pointerover', function (e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) show(el);
+  });
+  document.addEventListener('pointerout', function (e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) hide();
+  });
+  document.addEventListener('focusin', function (e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) show(el);
+  });
+  document.addEventListener('focusout', function (e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) hide();
+  });
+})();
+</script>
+</body>
+</html>
