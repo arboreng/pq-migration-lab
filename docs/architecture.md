@@ -1,12 +1,12 @@
 # Architecture
 
 This document describes the design goals for pq-migration-lab and how
-they're realized as of v0.8 ("Documentation and benchmarks") plus four
-stretch goals built on top of it: the certificate migration and CA
-rotation demos (both built on v0.5's signature agility), the TLS
-interoperability demo (built on v0.3's hybrid-TLS work), and the
-benchmark dashboard (built on v0.8's benchmark suite itself). See
-[`benchmarks/`](../benchmarks) for performance results referenced below.
+they're realized: the core algorithm-agility layer, plus four features
+built on top of it: the certificate migration and CA rotation demos
+(both built on signature agility), the TLS interoperability demo (built
+on the hybrid-TLS work), and the benchmark dashboard (built on the
+benchmark suite itself). See [`benchmarks/`](../benchmarks) for
+performance results referenced below.
 
 ## Core Components
 
@@ -96,7 +96,7 @@ constructor.
 
 Certificate migration (`cmd/pqlab/certmigration.go`) builds on signature
 agility (`internal/sig/ed25519`, `internal/sig/mldsa65`), the same way
-v0.3's hybrid-TLS demo built on v0.2's KEM agility. CA rotation
+the hybrid-TLS demo builds on KEM agility. CA rotation
 (`cmd/pqlab/carotation.go`) builds on cert-migration in turn, reusing its
 `issueLeaf` helper. Broader PKI evolution beyond that (revocation across
 a migration, multi-level intermediate hierarchies) remains future work.
