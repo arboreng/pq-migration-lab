@@ -1,9 +1,9 @@
-package classical
+package mlkem768
 
 import "testing"
 
-func TestX25519RoundTrip(t *testing.T) {
-	factory := NewX25519()
+func TestMLKEM768RoundTrip(t *testing.T) {
+	factory := NewMLKEM768()
 
 	initiator, err := factory.New()
 	if err != nil {
@@ -37,15 +37,19 @@ func TestX25519RoundTrip(t *testing.T) {
 	}
 }
 
-func TestX25519DecapsulateBeforeGenerate(t *testing.T) {
-	factory := NewX25519()
+func TestMLKEM768DecapsulateWrongCiphertextLength(t *testing.T) {
+	factory := NewMLKEM768()
 	session, err := factory.New()
 	if err != nil {
 		t.Fatalf("New() returned unexpected error: %v", err)
 	}
 	defer func() { _ = session.Close() }()
 
-	if _, err := session.Decapsulate(make([]byte, 32)); err == nil {
-		t.Fatal("Decapsulate() before GenerateKeyPair(): expected error, got nil")
+	if _, err := session.GenerateKeyPair(); err != nil {
+		t.Fatalf("GenerateKeyPair() returned unexpected error: %v", err)
+	}
+
+	if _, err := session.Decapsulate([]byte("too short")); err == nil {
+		t.Fatal("Decapsulate() with wrong-length ciphertext: expected error, got nil")
 	}
 }

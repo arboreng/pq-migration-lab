@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/arboreng/pq-migration-lab/internal/agility"
-	"github.com/arboreng/pq-migration-lab/internal/kem/classical"
-	"github.com/arboreng/pq-migration-lab/internal/kem/pq"
+	"github.com/arboreng/pq-migration-lab/internal/kem/mlkem768"
+	"github.com/arboreng/pq-migration-lab/internal/kem/x25519"
 )
 
 // fakeFactory/fakeSession is a minimal in-memory KEM used to unit-test the
@@ -97,7 +97,7 @@ func TestUnframeTruncated(t *testing.T) {
 }
 
 func TestHybridX25519MLKEM768Integration(t *testing.T) {
-	factory := NewHybrid(classical.NewX25519(), pq.NewMLKEM768())
+	factory := NewHybrid(x25519.NewX25519(), mlkem768.NewMLKEM768())
 
 	initiator, err := factory.New()
 	if err != nil {

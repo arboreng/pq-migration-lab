@@ -1,4 +1,4 @@
-package classical
+package x25519
 
 import "testing"
 

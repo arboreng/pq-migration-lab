@@ -1,8 +1,8 @@
-// Package pq implements agility.SignatureFactory for post-quantum
+// Package mldsa65 implements agility.SignatureFactory for post-quantum
 // signatures, backed by liboqs via the liboqs-go cgo bindings (same
-// requirements as internal/kem/pq: liboqs must be discoverable via
+// requirements as internal/kem/mlkem768: liboqs must be discoverable via
 // pkg-config: see docker/Dockerfile).
-package pq
+package mldsa65
 
 import (
 	"github.com/open-quantum-safe/liboqs-go/oqs"

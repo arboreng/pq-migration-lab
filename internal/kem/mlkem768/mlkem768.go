@@ -1,8 +1,8 @@
-// Package pq implements agility.KEMFactory for post-quantum key exchange,
-// backed by liboqs via the liboqs-go cgo bindings. Building or testing this
-// package requires liboqs's headers/libs to be discoverable via pkg-config
-// (see docker/Dockerfile, which builds and wires this up).
-package pq
+// Package mlkem768 implements agility.KEMFactory for post-quantum key
+// exchange, backed by liboqs via the liboqs-go cgo bindings. Building or
+// testing this package requires liboqs's headers/libs to be discoverable
+// via pkg-config (see docker/Dockerfile, which builds and wires this up).
+package mlkem768
 
 import (
 	"github.com/open-quantum-safe/liboqs-go/oqs"

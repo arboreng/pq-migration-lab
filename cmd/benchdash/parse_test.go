@@ -46,9 +46,9 @@ func TestParseBenchLineRejectsNonBenchmarkLines(t *testing.T) {
 		"",
 		"goos: linux",
 		"goarch: arm64",
-		"pkg: github.com/arboreng/pq-migration-lab/internal/kem/pq",
+		"pkg: github.com/arboreng/pq-migration-lab/internal/kem/mlkem768",
 		"PASS",
-		"ok  \tgithub.com/arboreng/pq-migration-lab/internal/kem/pq\t3.456s",
+		"ok  \tgithub.com/arboreng/pq-migration-lab/internal/kem/mlkem768\t3.456s",
 		"BenchmarkUnknownOperation-4    100    1000 ns/op",
 	}
 	for _, line := range lines {
@@ -61,11 +61,11 @@ func TestParseBenchLineRejectsNonBenchmarkLines(t *testing.T) {
 func TestParseBenchOutput(t *testing.T) {
 	output := `goos: linux
 goarch: arm64
-pkg: github.com/arboreng/pq-migration-lab/internal/kem/classical
+pkg: github.com/arboreng/pq-migration-lab/internal/kem/x25519
 BenchmarkX25519GenerateKeyPair-4    29676    40591 ns/op    368 B/op    6 allocs/op
 BenchmarkX25519Encapsulate-4    14072    85349 ns/op    496 B/op    9 allocs/op
 PASS
-ok  	github.com/arboreng/pq-migration-lab/internal/kem/classical	3.456s
+ok  	github.com/arboreng/pq-migration-lab/internal/kem/x25519	3.456s
 `
 	results, err := parseBenchOutput(strings.NewReader(output))
 	if err != nil {

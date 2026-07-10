@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	"github.com/arboreng/pq-migration-lab/internal/agility"
-	"github.com/arboreng/pq-migration-lab/internal/kem/classical"
-	"github.com/arboreng/pq-migration-lab/internal/kem/pq"
+	"github.com/arboreng/pq-migration-lab/internal/kem/mlkem768"
+	"github.com/arboreng/pq-migration-lab/internal/kem/x25519"
 )
 
 func newBenchHybridFactory() agility.KEMFactory {
-	return NewHybrid(classical.NewX25519(), pq.NewMLKEM768())
+	return NewHybrid(x25519.NewX25519(), mlkem768.NewMLKEM768())
 }
 
 func BenchmarkHybridGenerateKeyPair(b *testing.B) {

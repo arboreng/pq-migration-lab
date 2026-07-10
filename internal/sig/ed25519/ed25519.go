@@ -1,9 +1,9 @@
-// Package classical implements agility.SignatureFactory for classical
+// Package ed25519 implements agility.SignatureFactory for classical
 // (pre-quantum) signatures.
-package classical
+package ed25519
 
 import (
-	"crypto/ed25519"
+	stded25519 "crypto/ed25519"
 	"crypto/rand"
 	"errors"
 
@@ -30,11 +30,11 @@ func (ed25519Factory) New() (agility.SignatureSession, error) {
 }
 
 type ed25519Session struct {
-	priv ed25519.PrivateKey
+	priv stded25519.PrivateKey
 }
 
 func (s *ed25519Session) GenerateKeyPair() ([]byte, error) {
-	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	pub, priv, err := stded25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, err
 	}
@@ -44,16 +44,16 @@ func (s *ed25519Session) GenerateKeyPair() ([]byte, error) {
 
 func (s *ed25519Session) Sign(message []byte) ([]byte, error) {
 	if s.priv == nil {
-		return nil, errors.New("classical: Sign called before GenerateKeyPair")
+		return nil, errors.New("ed25519: Sign called before GenerateKeyPair")
 	}
-	return ed25519.Sign(s.priv, message), nil
+	return stded25519.Sign(s.priv, message), nil
 }
 
 func (s *ed25519Session) Verify(message, signature, publicKey []byte) (bool, error) {
-	if len(publicKey) != ed25519.PublicKeySize {
-		return false, errors.New("classical: incorrect public key length")
+	if len(publicKey) != stded25519.PublicKeySize {
+		return false, errors.New("ed25519: incorrect public key length")
 	}
-	return ed25519.Verify(ed25519.PublicKey(publicKey), message, signature), nil
+	return stded25519.Verify(stded25519.PublicKey(publicKey), message, signature), nil
 }
 
 func (s *ed25519Session) Close() error { return nil }
