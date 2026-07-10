@@ -41,14 +41,14 @@ benchmark dashboard (built on v0.8's benchmark suite itself). See
   `SignatureSession` (the signature contract). Concrete algorithms
   implement and register against these interfaces; nothing else in the
   codebase depends on a specific crypto library directly.
-- **`internal/kem/classical`**: `X25519`, via stdlib `crypto/ecdh`.
-- **`internal/kem/pq`**: `ML-KEM-768`, via liboqs (cgo bindings from
+- **`internal/kem/x25519`**: `X25519`, via stdlib `crypto/ecdh`.
+- **`internal/kem/mlkem768`**: `ML-KEM-768`, via liboqs (cgo bindings from
   `github.com/open-quantum-safe/liboqs-go`).
 - **`internal/kem/hybrid`**: composes any two `KEMFactory`s (by default,
   the two above) into one hybrid KEM.
-- **`internal/sig/classical`**: `Ed25519`, via stdlib `crypto/ed25519`.
-- **`internal/sig/pq`**: `ML-DSA-65`, via liboqs (same cgo bindings as
-  `internal/kem/pq`).
+- **`internal/sig/ed25519`**: `Ed25519`, via stdlib `crypto/ed25519`.
+- **`internal/sig/mldsa65`**: `ML-DSA-65`, via liboqs (same cgo bindings as
+  `internal/kem/mlkem768`).
 
 ## Algorithm Agility as a First-Class Design Goal
 
@@ -95,7 +95,7 @@ constructor.
 ## Extension Points
 
 Certificate migration (`cmd/pqlab/certmigration.go`) builds on signature
-agility (`internal/sig/classical`, `internal/sig/pq`), the same way
+agility (`internal/sig/ed25519`, `internal/sig/mldsa65`), the same way
 v0.3's hybrid-TLS demo built on v0.2's KEM agility. CA rotation
 (`cmd/pqlab/carotation.go`) builds on cert-migration in turn, reusing its
 `issueLeaf` helper. Broader PKI evolution beyond that (revocation across

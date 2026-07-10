@@ -1,4 +1,4 @@
-package pq
+package mldsa65
 
 import "testing"
 

@@ -1,4 +1,4 @@
-package pq
+package mlkem768
 
 import "testing"
 

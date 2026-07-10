@@ -4,7 +4,7 @@ Thanks for your interest in pq-migration-lab.
 
 ## Development
 
-The module cgo-depends on liboqs (`internal/kem/pq` and `internal/sig/pq`,
+The module cgo-depends on liboqs (`internal/kem/mlkem768` and `internal/sig/mldsa65`,
 via `github.com/open-quantum-safe/liboqs-go`), so `go build`/`go vet`/
 `go test`/`golangci-lint run` all need liboqs's headers/libs discoverable
 via `pkg-config`: see `docker/Dockerfile`'s `oqs-builder` and `devenv`

@@ -1,9 +1,9 @@
-package classical
+package mldsa65
 
 import "testing"
 
-func TestEd25519SignVerifyRoundTrip(t *testing.T) {
-	factory := NewEd25519()
+func TestMLDSA65SignVerifyRoundTrip(t *testing.T) {
+	factory := NewMLDSA65()
 	signer, err := factory.New()
 	if err != nil {
 		t.Fatalf("New() (signer) returned unexpected error: %v", err)
@@ -36,8 +36,8 @@ func TestEd25519SignVerifyRoundTrip(t *testing.T) {
 	}
 }
 
-func TestEd25519VerifyRejectsTampering(t *testing.T) {
-	factory := NewEd25519()
+func TestMLDSA65VerifyRejectsTampering(t *testing.T) {
+	factory := NewMLDSA65()
 	signer, err := factory.New()
 	if err != nil {
 		t.Fatalf("New() returned unexpected error: %v", err)
@@ -70,18 +70,5 @@ func TestEd25519VerifyRejectsTampering(t *testing.T) {
 	tamperedSig[0] ^= 0xFF
 	if valid, err := verifier.Verify(message, tamperedSig, pub); err != nil || valid {
 		t.Fatalf("Verify() with tampered signature = (%v, %v), want (false, nil)", valid, err)
-	}
-}
-
-func TestEd25519SignBeforeGenerateKeyPair(t *testing.T) {
-	factory := NewEd25519()
-	signer, err := factory.New()
-	if err != nil {
-		t.Fatalf("New() returned unexpected error: %v", err)
-	}
-	defer func() { _ = signer.Close() }()
-
-	if _, err := signer.Sign([]byte("too soon")); err == nil {
-		t.Fatal("Sign() before GenerateKeyPair(): expected error, got nil")
 	}
 }

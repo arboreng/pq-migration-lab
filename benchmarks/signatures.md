@@ -1,7 +1,7 @@
 # Signature Benchmarks
 
-Timings for the two registered signature schemes (`internal/sig/classical`,
-`internal/sig/pq`), captured with Go's standard benchmarking tooling.
+Timings for the two registered signature schemes (`internal/sig/ed25519`,
+`internal/sig/mldsa65`), captured with Go's standard benchmarking tooling.
 These quantify the relative cost of classical vs. post-quantum signing,
 not absolute performance claims; results vary by hardware and will differ
 on other machines.
@@ -54,7 +54,7 @@ gets the same versions regardless of host hardware.
   sign on a hot path.
 - **Zero allocations for both `Verify` implementations**: neither
   `crypto/ed25519.Verify` nor liboqs's `OQS_SIG_verify` (via
-  `internal/sig/pq`) allocates for the operation itself, only for setup
+  `internal/sig/mldsa65`) allocates for the operation itself, only for setup
   (which happens once per session, outside the timed loop in these
   benchmarks).
 - Certificate migration (`pqlab demo cert-migration`) only *issues*

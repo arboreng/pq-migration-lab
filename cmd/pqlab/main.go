@@ -21,11 +21,11 @@ import (
 	"os"
 
 	"github.com/arboreng/pq-migration-lab/internal/agility"
-	kemclassical "github.com/arboreng/pq-migration-lab/internal/kem/classical"
 	"github.com/arboreng/pq-migration-lab/internal/kem/hybrid"
-	kempq "github.com/arboreng/pq-migration-lab/internal/kem/pq"
-	sigclassical "github.com/arboreng/pq-migration-lab/internal/sig/classical"
-	sigpq "github.com/arboreng/pq-migration-lab/internal/sig/pq"
+	kemmlkem768 "github.com/arboreng/pq-migration-lab/internal/kem/mlkem768"
+	kemx25519 "github.com/arboreng/pq-migration-lab/internal/kem/x25519"
+	siged25519 "github.com/arboreng/pq-migration-lab/internal/sig/ed25519"
+	sigmldsa65 "github.com/arboreng/pq-migration-lab/internal/sig/mldsa65"
 )
 
 // version is set at build time via -ldflags "-X main.version=...".
@@ -66,11 +66,11 @@ func main() {
 // knows about, in one shared registry.
 func buildRegistry() *agility.Registry {
 	r := agility.NewRegistry()
-	x25519 := kemclassical.NewX25519()
-	mlkem768 := kempq.NewMLKEM768()
+	x25519 := kemx25519.NewX25519()
+	mlkem768 := kemmlkem768.NewMLKEM768()
 	hybridKEM := hybrid.NewHybrid(x25519, mlkem768)
-	ed25519 := sigclassical.NewEd25519()
-	mldsa65 := sigpq.NewMLDSA65()
+	ed25519 := siged25519.NewEd25519()
+	mldsa65 := sigmldsa65.NewMLDSA65()
 
 	algorithms := []agility.Algorithm{x25519, mlkem768, hybridKEM, ed25519, mldsa65}
 	for _, a := range algorithms {

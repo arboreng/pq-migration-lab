@@ -1,4 +1,4 @@
-package classical
+package ed25519
 
 import "testing"
 

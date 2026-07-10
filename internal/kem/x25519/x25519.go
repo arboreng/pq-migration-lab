@@ -1,8 +1,8 @@
-// Package classical implements agility.KEMFactory for classical
+// Package x25519 implements agility.KEMFactory for classical
 // (pre-quantum) key exchange, modeled as a KEM: Encapsulate generates an
 // ephemeral keypair and runs ECDH against the peer's public key, treating
 // the ephemeral public key as the "ciphertext".
-package classical
+package x25519
 
 import (
 	"crypto/ecdh"
@@ -62,7 +62,7 @@ func (s *x25519Session) Encapsulate(peerPublicKey []byte) (ciphertext, sharedSec
 
 func (s *x25519Session) Decapsulate(ciphertext []byte) ([]byte, error) {
 	if s.priv == nil {
-		return nil, errors.New("classical: Decapsulate called before GenerateKeyPair")
+		return nil, errors.New("x25519: Decapsulate called before GenerateKeyPair")
 	}
 	ephemeralPub, err := ecdh.X25519().NewPublicKey(ciphertext)
 	if err != nil {

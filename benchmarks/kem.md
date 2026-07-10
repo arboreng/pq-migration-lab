@@ -1,7 +1,7 @@
 # KEM Benchmarks
 
-Timings for the three registered KEMs (`internal/kem/classical`,
-`internal/kem/pq`, `internal/kem/hybrid`), captured with Go's standard
+Timings for the three registered KEMs (`internal/kem/x25519`,
+`internal/kem/mlkem768`, `internal/kem/hybrid`), captured with Go's standard
 benchmarking tooling. These quantify the relative cost of classical vs.
 post-quantum vs. hybrid key exchange, not absolute performance claims;
 results vary by hardware and will differ on other machines.
@@ -56,7 +56,7 @@ gets the same versions regardless of host hardware.
   `crypto/ecdh` X25519 is a portable Go implementation. `Encapsulate`
   being ~2x `GenerateKeyPair` for X25519 makes sense structurally: this
   KEM-from-DH construction generates a fresh ephemeral keypair *and* runs
-  ECDH on every `Encapsulate` call (see `internal/kem/classical/x25519.go`).
+  ECDH on every `Encapsulate` call (see `internal/kem/x25519/x25519.go`).
   Don't read these numbers as "ECDH is inherently slower than lattice
   crypto"; they're implementation-specific.
 - **Memory allocation profile differs by design**: ML-KEM-768's larger
