@@ -57,9 +57,9 @@ the algorithm-agility design goal.
 The classic hybrid-deployment pattern for migrating key exchange: run a
 classical and a post-quantum KEM side by side (rather than cutting over
 directly), so a break in either algorithm alone doesn't break the
-handshake. `internal/kem/hybrid` demonstrates this at the library level
-(v0.2); the `hybrid-tls` example below demonstrates it as a real TLS 1.3
-handshake (v0.3).
+handshake. `internal/kem/hybrid` demonstrates this at the library level;
+the `hybrid-tls` example below demonstrates it as a real TLS 1.3
+handshake.
 
 For certificates: a CA doesn't have to migrate its own signing algorithm
 before it can start issuing post-quantum leaf certificates: the CA's
