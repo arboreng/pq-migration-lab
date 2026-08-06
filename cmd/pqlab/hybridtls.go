@@ -119,8 +119,9 @@ func waitForPort(port int, timeout time.Duration) error {
 
 // generateEphemeralCert creates a self-signed ECDSA P-256 certificate and
 // key in a temp directory for the demo TLS server. Only the key-exchange
-// group is post-quantum/hybrid here; certificate/PKI migration is a
-// separate, later milestone, so the certificate itself stays classical.
+// group is post-quantum/hybrid here; certificate/PKI migration is covered
+// separately by the cert-migration and ca-rotation demos, so the
+// certificate itself stays classical.
 func generateEphemeralCert() (certPath, keyPath string, cleanup func(), err error) {
 	dir, err := os.MkdirTemp("", "pqlab-hybrid-tls-")
 	if err != nil {

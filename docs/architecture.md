@@ -269,7 +269,7 @@ result: ML-KEM-768's `GenerateKeyPair`/`Encapsulate` are actually *faster*
 than X25519's in these benchmarks: an artifact of liboqs's optimized
 native implementation versus Go's portable `crypto/ecdh`, not a claim
 that lattice cryptography is inherently cheaper. ML-DSA-65 signing, on
-the other hand, is genuinely ~19x slower than Ed25519: the clearest
+the other hand, is genuinely ~21x slower than Ed25519: the clearest
 "post-quantum costs more" result across either benchmark suite.
 
 `cmd/benchdash` (`cmd/benchdash/parse.go`, `render.go`, `main.go`) runs
