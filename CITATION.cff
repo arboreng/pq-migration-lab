@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use pq-migration-lab in published work, please cite it as below."
+type: software
+title: "pq-migration-lab"
+abstract: >-
+  A hands-on lab for post-quantum cryptography migration, treating the problem
+  as one of production engineering and crypto-agility rather than of algorithm
+  implementation. Covers ML-KEM and ML-DSA in TLS and PKI, hybrid key exchange,
+  certificate authority rotation, and the operational migration patterns and
+  benchmarks that standards and reference implementations leave out.
+authors:
+  - family-names: "O'Hara"
+    given-names: "Sean"
+    affiliation: "Arbor Engineering Group"
+    email: sean@arboreng.com
+repository-code: "https://github.com/arboreng/pq-migration-lab"
+# Point this at the field note once it is published; it is still an
+# unlisted draft, and this file is public metadata.
+url: "https://arboreng.com"
+license: MIT
+date-released: "2026-08-05"
+keywords:
+  - post-quantum cryptography
+  - crypto-agility
+  - ml-kem
+  - ml-dsa
+  - tls
+  - pki
+  - scientific software
