@@ -202,10 +202,16 @@ A signature cycle, as run by `pqlab demo sign <name>`
 
 The certificate migration demo (`pqlab demo cert-migration`) is, like
 hybrid-tls, entirely `openssl`-subprocess-orchestrated rather than using
-`internal/sig` directly: Go's stdlib `x509.CreateCertificate` and
-`x509.MarshalPKIXPublicKey` only recognize RSA/ECDSA/Ed25519 public keys,
-so they can't produce (or even represent) a certificate carrying an
-ML-DSA-65 subject public key. The flow:
+`internal/sig` directly. Through Go 1.26, Go's stdlib
+`x509.CreateCertificate` and `x509.MarshalPKIXPublicKey` recognized only
+RSA/ECDSA/Ed25519 public keys, so they could not produce (or even
+represent) a certificate carrying an ML-DSA-65 subject public key. Go
+1.27 closed that on 19 August 2026, adding ML-DSA to `crypto/x509` and
+`crypto/tls`. These demos predate it and still shell out to `openssl`,
+which is now a question of provider coverage: the remaining constraints
+below (`x509 -req` having no `-addext`, and `verify -untrusted` failing
+on a post-quantum intermediate) are oqs-provider behavior, not Go
+behavior. The flow:
 
 1. Issue a self-signed classical (Ed25519) CA: `openssl req -x509
    -newkey ed25519 ...`.

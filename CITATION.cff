@@ -14,9 +14,7 @@ authors:
     affiliation: "Arbor Engineering Group"
     email: sean@arboreng.com
 repository-code: "https://github.com/arboreng/pq-migration-lab"
-# Point this at the field note once it is published; it is still an
-# unlisted draft, and this file is public metadata.
-url: "https://arboreng.com"
+url: "https://arboreng.com/field-notes/pq-migration-lab"
 license: MIT
 date-released: "2026-08-05"
 keywords:

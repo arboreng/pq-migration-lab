@@ -19,6 +19,52 @@ the algorithm agility this repo is built around. This repo focuses on
 that gap: hybrid deployments, certificate migration, CA rotation,
 interoperability, benchmarking, and rollout strategies.
 
+## Scope
+
+This is a lab. It runs migration mechanics end to end in a pinned
+container so the failure modes are reproducible. What it establishes is
+where a post-quantum cutover actually breaks, and the answer is mostly
+tooling, not cryptography.
+
+It does not do the following, and none of it was left out by accident:
+
+- **No network measurement.** Nothing here contacts a host you do not
+  run. Every client connection in the demos targets `127.0.0.1`, against
+  a server the same command started moments earlier. Note that the two
+  `openssl s_server` subprocesses bind all interfaces (ports 14433 and
+  14435) for the few seconds they are alive, which is one reason the
+  documented path runs everything inside the container. Outbound access
+  is confined to the Docker build: base images, Debian packages, Go
+  modules, and the pinned liboqs and oqs-provider sources.
+- **No inventory.** This does not discover cryptographic dependencies
+  in a running estate.
+- **No post-quantum authentication in TLS.** The demo servers present
+  ECDSA P-256 certificates. Post-quantum signatures appear only at the
+  PKI layer, in certificate issuance. Go 1.27 added ML-DSA signature
+  schemes to `crypto/tls` on 19 August 2026, so this is now reachable in
+  the standard library. This lab predates that and does not use it.
+- **No standards-track hybrid combiner.** `internal/kem/hybrid`
+  combines its two component secrets with HKDF-SHA384 under the
+  repo-specific info string `"pq-migration-lab hybrid kem v1"`. It is
+  not wire-compatible with any TLS implementation, and it is not the
+  group the TLS demos negotiate. The two things named "hybrid" in this
+  repo never meet: see [`docs/architecture.md`](docs/architecture.md).
+- **No revocation, no multi-level intermediates.** PKI coverage stops
+  at CA rotation.
+- **Not production cryptography.** This composes Go's standard library,
+  liboqs, and oqs-provider. Everything substantive sits under
+  `internal/`, which Go enforces as non-importable.
+
+The demos also differ in proof strength, and the
+[Examples](#examples) section says which is which. `hybrid-tls` infers
+its result structurally. `interop-tls` reads the negotiated group back
+directly. `ca-rotation` is the strongest, because one of its four
+checks has to fail for the rotation to be safe.
+
+[Architecture Field Note: pq-migration-lab](https://arboreng.com/field-notes/pq-migration-lab)
+reviews this repository in more depth, including which of its demos
+prove something and which only infer it.
+
 ## Quick Start
 
 ```sh
@@ -57,9 +103,10 @@ the algorithm-agility design goal.
 The classic hybrid-deployment pattern for migrating key exchange: run a
 classical and a post-quantum KEM side by side (rather than cutting over
 directly), so a break in either algorithm alone doesn't break the
-handshake. `internal/kem/hybrid` demonstrates this at the library level;
-the `hybrid-tls` example below demonstrates it as a real TLS 1.3
-handshake.
+handshake. `internal/kem/hybrid` demonstrates this pattern at the
+library level. The `hybrid-tls` example below demonstrates the same
+pattern over a real TLS 1.3 handshake, by a separate path that never
+touches `internal/kem/hybrid`.
 
 For certificates: a CA doesn't have to migrate its own signing algorithm
 before it can start issuing post-quantum leaf certificates: the CA's
